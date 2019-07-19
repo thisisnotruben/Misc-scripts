@@ -9,11 +9,11 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://apod.nasa.gov/apod/"
-site = url + "archivepix.html"
+main_url = "https://apod.nasa.gov/apod/"
+site = main_url + "archivepix.html"
 file_path = "/home/rubsz/Pictures"
-dir = "NASA APOD"
-dir = os.path.join(file_path, dir)
+pic_dir = "NASA APOD"
+pic_dir = os.path.join(file_path, pic_dir)
 
 
 def get_page(url):
@@ -24,26 +24,26 @@ def get_page(url):
     return BeautifulSoup(page.text, "lxml")
 
 
-if not os.path.isdir(dir):
-    os.mkdir(dir)
+if not os.path.isdir(pic_dir):
+    os.mkdir(pic_dir)
 
-downloaded_pics = os.listdir(dir)
+downloaded_pics = os.listdir(pic_dir)
 
 page = get_page(site)
 
 for link in page.b.find_all("a"):
 
     pic_name = link.getText()
-    sub_page = url + link.get("href")
+    sub_page = main_url + link.get("href")
     sub_page = get_page(sub_page)
 
     try:
-        pic_link = url + sub_page.center.find_all("a")[1].get("href")
+        pic_link = main_url + sub_page.center.find_all("a")[1].get("href")
         extension_type = pic_link.rindex(".")
         extension_type = pic_link[extension_type:]
         pic_name += extension_type
         if pic_name not in downloaded_pics:
-            with open(os.path.join(dir, pic_name), "wb") as f:
+            with open(os.path.join(pic_dir, pic_name), "wb") as f:
                 f.write(requests.get(pic_link).content)
 
     except IndexError as e:
